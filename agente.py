@@ -88,10 +88,23 @@ def conversar(mensagem: Mensagem):
         }
 @app.post("/whatsapp")
 def whatsapp(payload: dict):
+    logger.info(f"Webhook recebido: {payload}")
+
     try:
-        mensagem = payload["data"]["message"]["conversation"]
-        telefone = payload["data"]["key"]["remoteJid"].replace("@s.whatsapp.net", "")
-        nome = payload["data"]["pushName"]
+        dados = payload["data"]
+
+        if dados["key"].get("fromMe"):
+            return {"status": "ignorado"}
+
+        msg = dados.get("message", {})
+        mensagem = msg.get("conversation") or msg.get("extendedTextMessage", {}).get("text")
+
+        if not mensagem:
+            logger.info("Mensagem sem texto, ignorada")
+            return {"status": "ignorado"}
+
+        telefone = dados["key"]["remoteJid"].split("@")[0]
+        nome = dados.get("pushName", "Cliente")
 
         salvar_mensagem(telefone, "cliente", mensagem)
 
@@ -111,15 +124,14 @@ def whatsapp(payload: dict):
         )
 
         salvar_mensagem(telefone, "atendente", resposta.text)
-        logger.info(f"WhatsApp respondido para {telefone}")
-        requests.post(
-    f"http://187.77.12.123:8080/message/sendText/lavi-python",
-    headers={"apikey": os.environ.get("EVOLUTION_API_KEY")},
-    json={
-        "number": telefone,
-        "text": resposta.text
-    }
-)
+
+        envio = requests.post(
+            "http://187.77.12.123:8080/message/sendText/lavi-python",
+            headers={"apikey": os.environ.get("EVOLUTION_API_KEY")},
+            json={"number": telefone, "text": resposta.text},
+            timeout=15
+        )
+        logger.info(f"Evolution respondeu {envio.status_code}: {envio.text}")
 
         return {"status": "ok"}
 
