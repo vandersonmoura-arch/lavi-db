@@ -1,6 +1,4 @@
-@'
-fastapi
+﻿fastapi
 uvicorn
 google-genai
 python-dotenv
-'@ | Set-Content requirements.txt -Enconding UTF8
