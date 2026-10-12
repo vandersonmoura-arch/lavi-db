@@ -1,3 +1,4 @@
+import requests
 from dotenv import load_dotenv
 from fastapi import FastAPI
 from pydantic import BaseModel
@@ -111,6 +112,14 @@ def whatsapp(payload: dict):
 
         salvar_mensagem(telefone, "atendente", resposta.text)
         logger.info(f"WhatsApp respondido para {telefone}")
+        requests.post(
+    f"http://187.77.12.123:8080/message/sendText/lavi-python",
+    headers={"apikey": os.environ.get("EVOLUTION_API_KEY")},
+    json={
+        "number": telefone,
+        "text": resposta.text
+    }
+)
 
         return {"status": "ok"}
 
