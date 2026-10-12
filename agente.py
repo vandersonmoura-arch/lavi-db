@@ -1,18 +1,28 @@
 from dotenv import load_dotenv
+from fastapi import FastAPI
+from pydantic import BaseModel
 from google import genai
 from pathlib import Path
 from banco import criar_banco, salvar_mensagem, buscar_historico
 import os
+import logging
 
 load_dotenv(dotenv_path=Path(__file__).parent / ".env")
 
-cliente = genai.Client(api_key=os.environ.get("GEMINI_API_KEY"))
+app = FastAPI()
 
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s | %(levelname)s | %(message)s"
+)
+logger = logging.getLogger("agente-lavi")
+
+cliente = genai.Client(api_key=os.environ.get("GEMINI_API_KEY"))
 
 SYSTEM_PROMPT = """
 Você é o atendente virtual da Barbearia LaVi.
 
-INFORMAÇÔES:
+INFORMAÇÕES:
 - Horário: Segunda a sábado das 9h às 19h
 - Domingo: FECHADO
 
@@ -32,31 +42,46 @@ REGRAS:
 
 criar_banco()
 
-telefone = input("Qual o seu telefone? ")
-nome = input("Qual o seu nome? ")
-print(f"\nOlá, {nome}! Bem-vindo à Barbearia LaVi.")
+class Mensagem(BaseModel):
+    telefone: str
+    nome: str
+    texto: str
 
-salvar_mensagem(telefone, "sistema", f"Cliente se apresentou: {nome}")
+@app.get("/")
+def inicio():
+    return {"mensagem": "Agente LaVi online"}
 
-while True:
-    pergunta =input(f"\n{nome}, o que deseja saber?")
+@app.post("/conversar")
+def conversar(mensagem: Mensagem):
+    logger.info(f"Mensagem de {mensagem.telefone}: {mensagem.texto}")
 
-    if pergunta == "sair":
-        print(f"Até logo, {nome}!")
-        break
+    salvar_mensagem(mensagem.telefone, "cliente", mensagem.texto)
 
-    salvar_mensagem(telefone, "cliente", pergunta)
-
-    registros = buscar_historico(telefone)
+    registros = buscar_historico(mensagem.telefone)
     historico_texto = "\n".join([f"{papel}: {msg}" for papel, msg in registros])
 
-    contexto = SYSTEM_PROMPT + "\n\nHistorico da conversa:\n" + historico_texto
-
-    resposta = cliente.models.generate_content(
-        model="gemini-3.5-flash-lite",
-        contents=contexto
+    contexto = (
+        SYSTEM_PROMPT
+        + f"\n\nCliente: {mensagem.nome}"
+        + "\n\nHistorico:\n"
+        + historico_texto
     )
 
-    salvar_mensagem(telefone, "atendente", resposta.text)
+    try:
+        resposta = cliente.models.generate_content(
+            model="gemini-3.5-flash-lite",
+            contents=contexto
+        )
+        salvar_mensagem(mensagem.telefone, "atendente", resposta.text)
+        logger.info(f"Resposta enviada para {mensagem.telefone}")
+        return {
+            "telefone": mensagem.telefone,
+            "resposta": resposta.text
+        }
 
-    print(f"\n{resposta.text}")
+    except Exception as erro:
+        logger.error(f"Falha: {erro}")
+        return {
+            "telefone": mensagem.telefone,
+            "resposta": "Estamos com instabilidade. Tente novamente."
+        }
