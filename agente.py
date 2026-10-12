@@ -85,3 +85,35 @@ def conversar(mensagem: Mensagem):
             "telefone": mensagem.telefone,
             "resposta": "Estamos com instabilidade. Tente novamente."
         }
+@app.post("/whatsapp")
+def whatsapp(payload: dict):
+    try:
+        mensagem = payload["data"]["message"]["conversation"]
+        telefone = payload["data"]["key"]["remoteJid"].replace("@s.whatsapp.net", "")
+        nome = payload["data"]["pushName"]
+
+        salvar_mensagem(telefone, "cliente", mensagem)
+
+        registros = buscar_historico(telefone)
+        historico_texto = "\n".join([f"{papel}: {msg}" for papel, msg in registros])
+
+        contexto = (
+            SYSTEM_PROMPT
+            + f"\n\nCliente: {nome}"
+            + "\n\nHistorico:\n"
+            + historico_texto
+        )
+
+        resposta = cliente.models.generate_content(
+            model="gemini-3.5-flash-lite",
+            contents=contexto
+        )
+
+        salvar_mensagem(telefone, "atendente", resposta.text)
+        logger.info(f"WhatsApp respondido para {telefone}")
+
+        return {"status": "ok"}
+
+    except Exception as erro:
+        logger.error(f"Erro no webhook: {erro}")
+        return {"status": "erro"}
