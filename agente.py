@@ -88,8 +88,7 @@ def conversar(mensagem: Mensagem):
         }
 @app.post("/whatsapp")
 def whatsapp(payload: dict):
-    logger.info(f"Webhook recebido: {payload}")
-
+    logger.info(f"Webhook recebido: tipo={payload.get('data', {}).get('messageType')}")
     try:
         dados = payload["data"]
 
