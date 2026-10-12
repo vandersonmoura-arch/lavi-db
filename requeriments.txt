@@ -1,6 +1,0 @@
-@'
-fastapi
-uvicorn
-google-genai
-python-dotenv
-'@ | Set-Content requirements.txt -Encoding UTF8
