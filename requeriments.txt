@@ -1,0 +1,6 @@
+fastapi
+uvicorn
+google-genai
+python-dotenv
+"fastapi`nuvicorn`ngoogle-genai`npython-dotenv`nrequests" | Set-Content requirements.txt -Encoding UTF8
+"fastapi`nuvicorn`ngoogle-genai`npython-dotenv`nrequests`npsycopg2-binary" | Set-Content requirements.txt -Encoding UTF8
