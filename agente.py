@@ -125,8 +125,7 @@ def whatsapp(payload: dict):
         salvar_mensagem(telefone, "atendente", resposta.text)
 
         chave_evo = (os.environ.get("EVOLUTION_API_KEY") or "").strip()
-        logger.info(f"Chave Evolution carregada: {bool(chave_evo)} | tamanho: {len(chave_evo or '')}")
-
+       
         envio = requests.post(
             "http://187.77.12.123:8080/message/sendText/lavi-python",
             headers={"apikey": chave_evo},
