@@ -45,17 +45,4 @@ def buscar_historico(telefone):
     
 criar_banco()
 
-# Teste
-salvar_mensagem("11999999999", "cliente", "Quero cortar o cabelo")
-salvar_mensagem("11999999999", "atendente", "O corte custa R$ 35")
-salvar_mensagem("11988888888", "cliente", "Quanto custa a barba?")
 
-historico = buscar_historico("11999999999")
-print("\nHistorico do cliente 11999999999:")
-for papel, mensagem in historico:
-    print(f"{papel}: {mensagem}")
-
-historico2 = buscar_historico("11988888888")
-print("\nHistorico do cliente 11988888888:")
-for papel, mensagem in historico2:
-    print(f"{papel}: {mensagem}")
