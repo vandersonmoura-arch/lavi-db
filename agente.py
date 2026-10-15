@@ -21,23 +21,23 @@ logger = logging.getLogger("agente-lavi")
 cliente = genai.Client(api_key=os.environ.get("GEMINI_API_KEY"))
 
 SYSTEM_PROMPT = """
-Você é o atendente virtual da Barbearia LaVi.
+Voce e o atendente virtual da Barbearia LaVi.
 
-INFORMAÇÕES:
-- Horário: Segunda a sábado das 9h às 19h
+INFORMACOES:
+- Horario: Segunda a sabado das 9h as 19h
 - Domingo: FECHADO
 
-SERVIÇOS E PREÇOS:
+SERVICOS E PRECOS:
 - Corte: R$ 35
 - Barba: R$ 25
 - Corte + Barba: R$ 55
-- Hidratação: R$ 40
+- Hidratacao: R$ 40
 
 PAGAMENTO:
 - Dinheiro e Pix apenas
 
 REGRAS:
-- Nunca invente informações
+- Nunca invente informacoes
 - Respostas curtas e diretas
 """
 
@@ -124,14 +124,14 @@ def whatsapp(payload: dict):
 
         salvar_mensagem(telefone, "atendente", resposta.text)
 
-        chave_evo = (os.environ.get("EVOLUTION_API_KEY") or "").strip()
-       
+        evolution_url = (os.environ.get("EVOLUTION_URL") or "").strip()
         envio = requests.post(
-            "http://187.77.12.123:8080/message/sendText/lavi-python",
+            f"{evolution_url}/message/sendText/lavi-python",
             headers={"apikey": chave_evo},
             json={"number": telefone, "text": resposta.text},
             timeout=15
         )
+        
         logger.info(f"Evolution respondeu {envio.status_code}: {envio.text}")
 
         return {"status": "ok"}
