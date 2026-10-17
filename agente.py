@@ -67,7 +67,7 @@ def conversar(mensagem: Mensagem):
         + "\n\nHistorico:\n"
         + historico_texto
     )
-
+    
     try:
         resposta = cliente.models.generate_content(
             model="gemini-3.5-flash-lite",
@@ -89,6 +89,8 @@ def conversar(mensagem: Mensagem):
 @app.post("/whatsapp")
 def whatsapp(payload: dict):
     logger.info(f"Webhook recebido: tipo={payload.get('data', {}).get('messageType')}")
+    chave_evo = (os.environ.get("EVOLUTION_API_KEY") or "").strip()
+    evolution_url = (os.environ.get("EVOLUTION_URL") or "").strip() 
     try:
         dados = payload["data"]
 
