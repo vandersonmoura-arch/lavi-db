@@ -91,7 +91,7 @@ def whatsapp(payload: dict):
     logger.info(f"Webhook recebido: tipo={payload.get('data', {}).get('messageType')}")
     chave_evo = (os.environ.get("EVOLUTION_API_KEY") or "").strip()
     evolution_url = (os.environ.get("EVOLUTION_URL") or "").strip() 
-    logger.info(f"EVOLUTION_URL carregada: {bool(evolution_url)} | tamanho: {len(evolution_url)}")
+    
     try:
         dados = payload["data"]
 
@@ -121,7 +121,7 @@ def whatsapp(payload: dict):
         )
 
         resposta = cliente.models.generate_content(
-            model="modelo-que-nao-existe",
+            model="gemini-3.5-flash-lite",
             contents=contexto
         )
 
