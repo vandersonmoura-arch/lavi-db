@@ -121,7 +121,7 @@ def whatsapp(payload: dict):
         )
 
         resposta = cliente.models.generate_content(
-            model="gemini-3.5-flash-lite",
+            model= model="modelo-que-nao-existe",
             contents=contexto
         )
 
@@ -141,4 +141,12 @@ def whatsapp(payload: dict):
 
     except Exception as erro:
         logger.error(f"Erro no webhook: {erro}")
+
+        requests.post(
+            f"{evolution_url}/message/sendText/lavi-python",
+            headers={"apikey": chave_evo},
+            json={"number": telefone, "text": "Estamos com instabilidade no momento. Tente novamente em alguns minutos."},
+            timeout=15
+        )
+
         return {"status": "erro"}
