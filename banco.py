@@ -48,10 +48,13 @@ def buscar_historico(telefone):
     cursor = conexao.cursor()
 
     cursor.execute("""
-        SELECT papel, mensagem FROM historico
-        WHERE telefone = %s
-        ORDER BY id ASC
-    """, (telefone,))
+
+    SELECTpapel,mensagem FROM historico
+    WHERE telefone = %s
+    ORDER BY ID DESC
+    LIMIT 20
+    """, ( telefone,))
+    
 
     registros = cursor.fetchall()
     conexao.close()
