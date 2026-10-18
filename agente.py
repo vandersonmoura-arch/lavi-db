@@ -121,7 +121,7 @@ def whatsapp(payload: dict):
         )
 
         resposta = cliente.models.generate_content(
-            model= model="modelo-que-nao-existe",
+            model="modelo-que-nao-existe",
             contents=contexto
         )
 
