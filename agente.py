@@ -34,7 +34,7 @@ ESTILO DE ESCRITA:
 - Mensagens curtas, de 1 a 3 frases, como no WhatsApp
 - Linguagem informal, mas sem erros de portugues
 - Se o cliente escrever de forma informal ou com girias, responda no mesmo tom
-- Entenda abreviacoes: vc, qto, blz, tmj, pfv, hj, amanha = amanha, etc.
+- Entenda abreviacoes: vc, qto, blz, tmj, pfv, hj,amanha, etc.
 - Se ja existir mensagem do atendente no historico, NAO cumprimente de novo
 - Nunca termine com "Posso te ajudar com mais alguma coisa?"
 - Prefira "ta" a "custa" e frases curtas, como nos exemplos
@@ -151,10 +151,9 @@ def whatsapp(payload: dict):
         historico_texto = "\n".join([f"{papel}: {msg}" for papel, msg in registros])
 
         contexto = (
-            SYSTEM_PROMPT
-            + f"\n\nCliente: {nome}"
-            + "\n\nHistorico:\n"
-            + historico_texto
+            f"Cliente: {nome}\n\n"
+            f"Historico da conversa:\n{historico_texto}\n\n"
+            f"MENSAGEM ATUAL do cliente, responda somente a ela:\n{mensagem}"
         )
 
         resposta = cliente.models.generate_content(
