@@ -59,3 +59,4 @@ def buscar_historico(telefone):
     registros = cursor.fetchall()
     conexao.close()
     return registros
+    return list(reversed(registros))
