@@ -49,7 +49,7 @@ def buscar_historico(telefone):
 
     cursor.execute("""
 
-    SELECTpapel,mensagem FROM historico
+    SELECT papel, mensagem FROM historico
     WHERE telefone = %s
     ORDER BY ID DESC
     LIMIT 20
