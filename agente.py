@@ -155,10 +155,12 @@ def whatsapp(payload: dict):
             f"Historico da conversa:\n{historico_texto}\n\n"
             f"MENSAGEM ATUAL do cliente, responda somente a ela:\n{mensagem}"
         )
-
         resposta = cliente.models.generate_content(
             model="gemini-3.5-flash-lite",
-            contents=contexto
+            contents=contexto,
+            config=types.GenerateContentConfig(
+                system_instruction=SYSTEM_PROMPT
+            )
         )
 
         salvar_mensagem(telefone, "atendente", resposta.text)
